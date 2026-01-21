@@ -1,0 +1,36 @@
+sign-pdf-app/
+│
+├─ package.json
+├─ index.js                 # Точка входа (EXE)
+│
+├─ server/
+│   ├─ server.js             # HTTP сервер (Express/Fastify)
+│   ├─ routes/
+│   │   └─ api.js             # API: получить PDF, сохранить PDF
+│   └─ services/
+│       └─ pdfSaveService.js  # Логика сохранения итогового PDF
+│
+├─ frontend/
+│   ├─ index.html             # UI
+│   ├─ css/
+│   │   └─ style.css
+│   ├─ js/
+│   │   ├─ app.js             # Главная логика UI
+│   │   ├─ pdfViewer.js       # Загрузка и рендер PDF
+│   │   ├─ stamps.js          # Факсимиле (движение, масштаб, поворот)
+│   │   ├─ pagesModal.js      # Модалка выбора страниц
+│   │   └─ state.js           # Глобальное состояние
+│   └─ lib/
+│       └─ pdfjs/             # PDF.js (локально, не CDN)
+│
+├─ assets/
+│   └─ icons/
+│
+├─ temp/
+│   ├─ input.pdf              # Копия входного PDF
+│   └─ stamps/
+│       ├─ stamp1.png
+│       └─ stamp2.png
+│
+└─ build/
+    └─ signpdf.exe            # Результат сборки
