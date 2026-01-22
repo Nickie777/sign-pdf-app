@@ -12,3 +12,12 @@ async function loadConfig() {
 }
 
 loadConfig();
+
+async function init() {
+  const res = await fetch("/api/config");
+  const config = await res.json();
+
+  await renderPDF(config.pdfUrl);
+}
+
+init();

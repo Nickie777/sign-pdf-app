@@ -2,9 +2,28 @@ body {
   font-family: Arial, sans-serif;
   margin: 20px;
 }
-h1 {
-  color: #333;
+
+#pdf-container {
+  width: 800px;
+  margin: auto;
 }
-h2 {
-  color: #555;
+
+.pdf-page {
+  position: relative;
+  margin-bottom: 30px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+}
+
+.pdf-canvas {
+  display: block;
+  margin: auto;
+}
+
+/* слой под факсимиле */
+.overlay-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }

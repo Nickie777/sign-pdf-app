@@ -10,7 +10,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^5.4.530"
+    "pdfjs-dist": "^2.16.105"
   },
   "devDependencies": {
     "pkg": "^5.8.1"
