@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-//import open from "open";
+const fs = require("fs");
+const path = require("path");
+const { exec } = require("child_process");
+const startServer = require("./server/server");
 
-import startServer from "./server/server.js";
-
-// === служебное ===
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// === параметры запуска ===
+// ===============================
+// 1. Чтение параметров запуска
+// ===============================
 const args = process.argv.slice(2);
 
 if (args.length < 2) {
@@ -24,7 +20,9 @@ const pdfPath = path.resolve(args[0]);
 const stamp1Path = path.resolve(args[1]);
 const stamp2Path = args[2] ? path.resolve(args[2]) : null;
 
-// === проверки ===
+// ===============================
+// 2. Проверка файлов
+// ===============================
 function checkFile(filePath, description) {
   if (!fs.existsSync(filePath)) {
     console.error(`Файл не найден: ${description}`);
@@ -37,35 +35,47 @@ checkFile(pdfPath, "PDF документ");
 checkFile(stamp1Path, "Факсимиле №1");
 if (stamp2Path) checkFile(stamp2Path, "Факсимиле №2");
 
-// === temp директория ===
-const tempDir = path.join(__dirname, "temp");
+// ===============================
+// 3. Подготовка temp директорий
+// ===============================
+const rootDir = process.cwd();
+const tempDir = path.join(rootDir, "temp");
 const stampsDir = path.join(tempDir, "stamps");
 
 fs.mkdirSync(stampsDir, { recursive: true });
 
-// === копирование файлов ===
-const tempPdfPath = path.join(tempDir, "input.pdf");
-fs.copyFileSync(pdfPath, tempPdfPath);
+// ===============================
+// 4. Копирование файлов
+// ===============================
+fs.copyFileSync(pdfPath, path.join(tempDir, "input.pdf"));
+fs.copyFileSync(stamp1Path, path.join(stampsDir, "stamp1.png"));
 
-const tempStamp1 = path.join(stampsDir, "stamp1.png");
-fs.copyFileSync(stamp1Path, tempStamp1);
-
-let tempStamp2 = null;
 if (stamp2Path) {
-  tempStamp2 = path.join(stampsDir, "stamp2.png");
-  fs.copyFileSync(stamp2Path, tempStamp2);
+  fs.copyFileSync(stamp2Path, path.join(stampsDir, "stamp2.png"));
 }
 
-// === старт сервера ===
+// ===============================
+// 5. Запуск сервера
+// ===============================
 const PORT = 3000;
 
 startServer({
   port: PORT,
-  pdfPath: tempPdfPath,
   stamps: {
     stamp1: "/stamps/stamp1.png",
-    stamp2: tempStamp2 ? "/stamps/stamp2.png" : null
+    stamp2: stamp2Path ? "/stamps/stamp2.png" : null
   }
-}).then(() => {
-  open(`http://localhost:${PORT}`);
-});
+})
+  .then(() => {
+    const url = `http://localhost:${PORT}`;
+    console.log(`Открытие браузера: ${url}`);
+
+    // ===============================
+    // 6. Открытие браузера (Windows)
+    // ===============================
+    exec(`start "" "${url}"`);
+  })
+  .catch(err => {
+    console.error("Ошибка запуска сервера:", err);
+    process.exit(1);
+  });

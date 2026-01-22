@@ -1,29 +1,29 @@
-import express from "express";
-import path from "path";
+const express = require("express");
+const path = require("path");
 
-export default function startServer(config) {
+module.exports = function startServer(config) {
   const app = express();
+  const rootDir = process.cwd();
 
-  const __dirname = path.resolve();
+  app.use("/stamps", express.static(path.join(rootDir, "temp/stamps")));
+  app.use("/pdf", express.static(path.join(rootDir, "temp")));
+  app.use("/frontend", express.static(path.join(rootDir, "frontend")));
 
-  app.use("/stamps", express.static(path.join(__dirname, "temp/stamps")));
-  app.use("/pdf", express.static(path.join(__dirname, "temp")));
-
-  app.get("/", (req, res) => {
-    res.send(`
-      <html>
-        <body>
-          <h2>Сервер запущен</h2>
-          <p>PDF: ${config.pdfPath}</p>
-        </body>
-      </html>
-    `);
+  app.get("/api/config", (req, res) => {
+    res.json({
+      pdfUrl: "/pdf/input.pdf",
+      stamps: config.stamps
+    });
   });
 
-  return new Promise((resolve) => {
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(rootDir, "frontend/index.html"));
+  });
+
+  return new Promise(resolve => {
     app.listen(config.port, () => {
-      console.log(`Server started on port ${config.port}`);
+      console.log(`Server started at http://localhost:${config.port}`);
       resolve();
     });
   });
-}
+};
